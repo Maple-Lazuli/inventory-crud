@@ -1,3 +1,9 @@
+DROP DATABASE IF EXISTS inventory_db;    
+
+CREATE DATABASE inventory_db; 
+
+\c inventory_db;  
+
 CREATE TABLE roles(
    role_id serial PRIMARY KEY,
    role_name VARCHAR (255) UNIQUE NOT NULL
