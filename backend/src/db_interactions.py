@@ -2,8 +2,16 @@ from dataclasses import dataclass
 import psycopg2 as pg
 from psycopg2.errorcodes import UNIQUE_VIOLATION
 from psycopg2 import errors
+import random
 
 from datetime import datetime, timedelta
+import hashlib
+
+
+def generate_code():
+    hasher = hashlib.sha512()
+    hasher.update(f"{datetime.now()} {random.randint(1, 100000)}".encode())
+    return hasher.hexdigest()
 
 
 @dataclass
@@ -18,34 +26,41 @@ class DBInteractions:
         self.connection = pg.connect(database=self.db_name,
                                      user=self.db_user,
                                      password=self.db_pass,
-                                     host=self.db_pass,
+                                     host=self.db_host,
                                      port=self.db_port)
 
     def create_new_role(self, role_name):
         try:
             with self.connection, self.connection.cursor() as cur:
-                cur.execute(f"insert into roles (role_name) values (%s);", role_name)
+                cur.execute("insert into roles (role_name) values (%(r)s);", {'r':role_name})
 
             return True
+            # TODO
             # Log f"Added {role_name} Successfully"
 
         except errors.lookup(UNIQUE_VIOLATION) as e:
+            print(e)
             return False
+            # TODO
             # "Unique Violation"
 
         except Exception as e:
+            print(e)
+
             return False
+            # TODO
             # log exception
 
     def get_roles(self):
         try:
             with self.connection, self.connection.cursor() as cur:
                 cur.execute(f"select * from roles;")
-
-            return cur.fetchall()
+                return cur.fetchall()
 
         except Exception as e:
+            print(e)
             return []
+            # TODO
             # log exception
 
     def create_account(self, role_id, first_name, last_name, user_name, password, salt):
@@ -58,10 +73,12 @@ class DBInteractions:
                        'password:': password, 'created_on': datetime.now(), 'salt': salt})
 
             return True
+            # TODO
             # Log f"Added {role_name} Successfully"
 
         except Exception as e:
             return False
+        # TODO
 
     def get_account(self, user_name):
 
@@ -73,6 +90,7 @@ class DBInteractions:
 
         except Exception as e:
             return None
+        # TODO
 
     def delete_account(self, user_name):
         try:
@@ -83,6 +101,7 @@ class DBInteractions:
 
         except Exception as e:
             return False
+        # TODO
 
     def update_permissions(self, role_id, user_name):
         try:
@@ -92,6 +111,7 @@ class DBInteractions:
         except Exception as e:
             return False
             # log failure
+        # TODO
 
         try:
             account_id = self.get_accounts(user_name)['account_id']
@@ -104,6 +124,7 @@ class DBInteractions:
         except Exception as e:
             return False
             # log failure
+        # TODO
 
         return True
 
@@ -117,6 +138,7 @@ class DBInteractions:
 
         except Exception as e:
             return None
+        # TODO
 
     def add_session(self, account_id):
         # create code
@@ -133,6 +155,7 @@ class DBInteractions:
         except Exception as e:
             return None
             # log failure
+        # TODO
 
     def add_item(self, account_id, name, description, quantity):
         try:
@@ -147,6 +170,7 @@ class DBInteractions:
         except Exception as e:
             return None
             # log failure
+        # TODO
 
     def get_items(self, item_id=None):
         try:
@@ -158,6 +182,7 @@ class DBInteractions:
 
         except Exception as e:
             return None
+        # TODO
 
     def delete_item(self, item_id):
         try:
@@ -168,6 +193,7 @@ class DBInteractions:
 
         except Exception as e:
             return False
+        # TODO
 
     def update_item(self, item_id, name, description, quantity):
         try:
@@ -175,7 +201,18 @@ class DBInteractions:
                 cur.execute(f"""update items SET name = %(name)s, description = %(description)s, 
                 quantity = %(quantity)s, modification_date = %(modification_date)s, where item_id = %(item_id)s;""",
                             {'name': name, 'description': description, 'quantity': quantity,
-                             'modification_date': datetime.now(),'item_id': item_id})
+                             'modification_date': datetime.now(), 'item_id': item_id})
         except Exception as e:
             return False
             # log failure
+        # TODO
+
+
+if __name__ == "__main__":
+    interactor = DBInteractions()
+
+    # Add Roles
+    print(interactor.get_roles())
+    print(interactor.create_new_role("Administrator"))
+    print(interactor.get_roles())
+
