@@ -1,4 +1,5 @@
 backend/venv/*
 backend/.idea/*
 backend/test_notebooks/*
-frontend/*
+frontend/Inventory/node_modules/*
+
