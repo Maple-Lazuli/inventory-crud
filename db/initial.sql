@@ -18,6 +18,8 @@ CREATE TABLE accounts (
 	username VARCHAR ( 50 ) UNIQUE NOT NULL,
 	password VARCHAR ( 50 ) NOT NULL,
 	salt INT NOT NULL,
+	locked BOOL NOT NULL,
+	log_in_attempts INT NOT NULL,
   	FOREIGN KEY (role_id) REFERENCES roles (role_id)
 	
 );
@@ -37,7 +39,6 @@ CREATE TABLE sessions (
 	creation_date TIMESTAMP NOT NULL,
 	end_date TIMESTAMP NOT NULL,
 	session_code VARCHAR ( 255 ),
-	is_active  BOOL NOT NULL,
 	FOREIGN KEY (account_id) REFERENCES accounts (account_id)
 );
 
@@ -48,7 +49,7 @@ CREATE TABLE items (
 	description VARCHAR ( 255 ) NULL,
 	quantity INT NOT NULL,
 	creation_date TIMESTAMP NOT NULL,
-	modification_date TIMESTAMP NOT NULL,
+	modification_date TIMESTAMP,
 	FOREIGN KEY (account_id) REFERENCES accounts (account_id)
 );
 
