@@ -103,6 +103,24 @@ class DBInteractions:
             return False
         # TODO
 
+    def update_account(self, account_id, first_name, last_name, user_name, password):
+
+        try:
+            with self.connection, self.connection.cursor() as cur:
+                cur.execute(f"""update accounts SET first_name = %(first_name)s, last_name = %(last_name)s,
+                 username = %(username)s, password = %(password)s where account_id = %(account_id)s;""",
+                            {'account_id': account_id, 'first_name': first_name, 'last_name': last_name,
+                             'username': user_name, 'password': password})
+
+            return True
+            # TODO
+            # Log f"Updated {role_name} Successfully"
+
+        except Exception as e:
+            print(e)
+            return False
+        # TODO
+
     def get_account_by_id(self, account_id):
         result = None
         try:

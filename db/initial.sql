@@ -16,7 +16,7 @@ CREATE TABLE accounts (
 	last_name VARCHAR ( 50 ) NOT NULL,
 	created_on TIMESTAMP NOT NULL,
 	username VARCHAR ( 50 ) UNIQUE NOT NULL,
-	password VARCHAR ( 50 ) NOT NULL,
+	password VARCHAR ( 128 ) NOT NULL,
 	salt INT NOT NULL,
 	locked BOOL NOT NULL,
 	log_in_attempts INT NOT NULL,
@@ -38,14 +38,14 @@ CREATE TABLE sessions (
 	account_id INT NOT NULL,
 	creation_date TIMESTAMP NOT NULL,
 	end_date TIMESTAMP NOT NULL,
-	session_code VARCHAR ( 255 ),
+	session_code VARCHAR ( 128 ),
 	FOREIGN KEY (account_id) REFERENCES accounts (account_id)
 );
 
 CREATE TABLE items (
 	item_id serial PRIMARY KEY,
 	account_id INT NOT NULL,
-	name VARCHAR ( 255 ) NULL,
+	name VARCHAR ( 50 ) NULL,
 	description VARCHAR ( 255 ) NULL,
 	quantity INT NOT NULL,
 	creation_date TIMESTAMP NOT NULL,
