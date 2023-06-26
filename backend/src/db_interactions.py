@@ -52,25 +52,47 @@ class DBInteractions:
             # log exception
 
     def get_roles(self):
+        fetched_roles = []
         try:
             with self.connection, self.connection.cursor() as cur:
                 cur.execute(f"select * from roles;")
-                return cur.fetchall()
+                fetched_roles = cur.fetchall()
+
+            return [Role(*r) for r in fetched_roles]
 
         except Exception as e:
             print(e)
-            return []
+            return fetched_roles
             # TODO
             # log exception
+
+    def get_role(self, role_id):
+
+        try:
+            with self.connection, self.connection.cursor() as cur:
+                cur.execute(f"select * from roles where role_id = %(u)s;", {'u': role_id})
+                result = cur.fetchone()
+            return Role(*result) if result is not None else None
+
+        except Exception as e:
+            print(e)
+            return None
+        # TODO
 
     def create_account(self, role_id, first_name, last_name, user_name, password, salt):
 
         try:
             with self.connection, self.connection.cursor() as cur:
                 cur.execute(f"""insert into accounts (role_id, first_name, last_name, created_on, username, password,
-                    salt) values (%(role_id)s,%(first_name)s,%(last_name)s,%(created_on)s,%(username)s,
-                    %(password)s,%(salt)s);""", {'role_id': 1, 'first_name': first_name, 'last_name':
-                    last_name, 'username': user_name, 'password': password, 'created_on': datetime.now(), 'salt': salt})
+                    salt, locked, log_in_attempts) values (%(role_id)s,%(first_name)s,%(last_name)s,%(created_on)s,
+                    %(username)s,%(password)s,%(salt)s,%(locked)s,%(log_ins)s);""", {'role_id': role_id,
+                                                                                     'first_name': first_name,
+                                                                                     'last_name': last_name,
+                                                                                     'username': user_name,
+                                                                                     'password': password,
+                                                                                     'created_on': datetime.now(),
+                                                                                     'salt': salt, 'locked': False,
+                                                                                     'log_ins': 0})
 
             return True
             # TODO
@@ -81,26 +103,48 @@ class DBInteractions:
             return False
         # TODO
 
-    def get_account(self, user_name=None, account_id=None):
-
+    def get_account_by_id(self, account_id):
+        result = None
         try:
-            if user_name is not None:
-                with self.connection, self.connection.cursor() as cur:
-                    cur.execute(f"select * from accounts where username = %(u)s;", {'u': user_name})
-                    return cur.fetchone()
+            with self.connection, self.connection.cursor() as cur:
+                cur.execute(f"select * from accounts where account_id = %(id)s;", {'id': account_id})
+                result = cur.fetchone()
 
-            elif account_id is not None:
-                with self.connection, self.connection.cursor() as cur:
-                    cur.execute(f"select * from accounts where account_id = %(id)s;", {'id': account_id})
+            return Account(*result) if result is not None else None
+        except Exception as e:
+            print(e)
+            return result
+        # TODO
 
-                    return cur.fetchone()
+    def get_account_by_username(self, user_name):
+        result = None
+        try:
+            with self.connection, self.connection.cursor() as cur:
+                cur.execute(f"select * from accounts where username = %(id)s;", {'id': user_name})
+                result = cur.fetchone()
+
+            return Account(*result) if result is not None else None
+        except Exception as e:
+            print(e)
+            return result
+        # TODO
+
+    def get_accounts(self):
+        fetched_accounts = []
+        try:
+            with self.connection, self.connection.cursor() as cur:
+                cur.execute(f"select * from accounts where;")
+                fetched_accounts = cur.fetchall()
+
+                return [Account(*a) for a in fetched_accounts]
 
         except Exception as e:
             print(e)
-            return None
+            return fetched_accounts
         # TODO
 
     def delete_account(self, user_name):
+
         try:
             with self.connection, self.connection.cursor() as cur:
                 cur.execute(f"delete from accounts where username = %(u)s;", {'u': user_name})
@@ -112,7 +156,46 @@ class DBInteractions:
             return False
         # TODO
 
+    def set_account_lock(self, account_id, locked):
+        try:
+            with self.connection, self.connection.cursor() as cur:
+                cur.execute(f"update accounts SET locked = %(locked)s where account_id = %(account_id)s;",
+                            {'locked': locked, 'account_id': account_id})
+        except Exception as e:
+            print(e)
+            return False
+            # log failure
+
+    def increment_log_in_attempt(self, account_id):
+        account = self.get_account_by_id(account_id)
+        log_in_attempts = account.log_in_attempts + 1
+        try:
+            with self.connection, self.connection.cursor() as cur:
+                cur.execute(
+                    f"update accounts SET log_in_attempts = %(log_in_attempts)s where account_id = %(account_id)s;",
+                    {'log_in_attempts': log_in_attempts, 'account_id': account_id})
+            return True
+
+        except Exception as e:
+            print(e)
+            return False
+            # log failure
+
+    def reset_log_in_attempt(self, account_id):
+        try:
+            with self.connection, self.connection.cursor() as cur:
+                cur.execute(
+                    f"update accounts SET log_in_attempts = %(log_in_attempts)s where account_id = %(account_id)s;",
+                    {'log_in_attempts': 0, 'account_id': account_id})
+            return True
+
+        except Exception as e:
+            print(e)
+            return False
+            # log failure
+
     def update_permissions(self, role_id, account_id):
+
         try:
             with self.connection, self.connection.cursor() as cur:
                 cur.execute(f"update accounts SET role_id = %(role_id)s where account_id = %(account_id)s;",
@@ -138,28 +221,32 @@ class DBInteractions:
         return True
 
     def get_permission_changes(self):
+        results = []
         try:
             with self.connection, self.connection.cursor() as cur:
                 cur.execute(f"select * from permission_changes;")
-                return cur.fetchall()
+                results = cur.fetchall()
+            return [PermissionChange(*pc) for pc in results]
 
         except Exception as e:
             print(e)
-            return []
+            return results
             # TODO
             # log exception
 
     def get_session(self, code, account_id):
+        fetched_session = None
         try:
             with self.connection, self.connection.cursor() as cur:
                 cur.execute(f"select * from sessions where session_code = %(code)s and account_id = %(account_id)s;",
                             {'code': code, 'account_id': account_id})
 
-                return cur.fetchone()
+                fetched_session = cur.fetchone()
+            return Session(*fetched_session) if fetched_session is not None else None
 
         except Exception as e:
             print(e)
-            return None
+            return fetched_session
         # TODO
 
     def add_session(self, account_id):
@@ -196,23 +283,44 @@ class DBInteractions:
             # log failure
         # TODO
 
-    def get_items(self, item_id=None):
+    def get_item(self, item_id):
+
+        fetched_item = None
         try:
+
             with self.connection, self.connection.cursor() as cur:
                 cur.execute(f"select * from items where item_id = %(item_id)s;",
                             {'item_id': item_id})
 
-                return cur.fetchone()
+                fetched_item = cur.fetchone()
+
+            return Item(*fetched_item) if fetched_item is not None else None
 
         except Exception as e:
             print(e)
-            return None
+            return fetched_item
+        # TODO
+
+    def get_items(self):
+        fetched_items = []
+        try:
+            with self.connection, self.connection.cursor() as cur:
+                cur.execute(f"select * from items;")
+
+                fetched_items = cur.fetchall()
+
+            return [Item(*i) for i in fetched_items]
+
+        except Exception as e:
+            print(e)
+            return fetched_items
         # TODO
 
     def delete_item(self, item_id):
         try:
             with self.connection, self.connection.cursor() as cur:
-                cur.execute(f"delete * from items where item_id = %s;", item_id)
+                cur.execute(f"delete from items where item_id = %(item_id)s;",
+                            {'item_id': item_id})
 
             return True
 
@@ -225,9 +333,10 @@ class DBInteractions:
         try:
             with self.connection, self.connection.cursor() as cur:
                 cur.execute(f"""update items SET name = %(name)s, description = %(description)s, 
-                quantity = %(quantity)s, modification_date = %(modification_date)s, where item_id = %(item_id)s;""",
+                quantity = %(quantity)s, modification_date = %(modification_date)s where item_id = %(item_id)s;""",
                             {'name': name, 'description': description, 'quantity': quantity,
                              'modification_date': datetime.now(), 'item_id': item_id})
+                return True
         except Exception as e:
             print(e)
             return False
@@ -235,10 +344,59 @@ class DBInteractions:
         # TODO
 
 
+@dataclass
+class Role:
+    role_id: int
+    role_name: str
+
+
+@dataclass
+class Account:
+    account_id: int
+    role_id: int
+    first_name: str
+    last_name: str
+    created_on: datetime
+    user_name: str
+    password: str
+    salt: int
+    locked: bool
+    log_in_attempts: int
+
+
+@dataclass
+class PermissionChange:
+    change_id: int
+    account_id: int
+    role_id: int
+    change_date: datetime
+
+
+@dataclass
+class Session:
+    session_id: int
+    account_id: int
+    creation_date: datetime
+    end_date: datetime
+    session_code: str
+
+
+@dataclass
+class Item:
+    item_id: int
+    account_id: int
+    name: str
+    description: str
+    quantity: int
+    creation_date: datetime
+    modification_date: datetime
+
+
 if __name__ == "__main__":
     interactor = DBInteractions()
 
     # Roles
+    print(f"{'*' * 100}")
     print("ROLES")
     print(interactor.get_roles())
     print(interactor.create_new_role("Administrator"))
@@ -247,33 +405,62 @@ if __name__ == "__main__":
     print(interactor.get_roles())
 
     # Accounts
+    print(f"{'*' * 100}")
     print("ACCOUNTS")
     roles = interactor.get_roles()[0]
-    id = roles[0]
+    id = roles.role_id
     print(interactor.create_account(id, "Ada", "Lazi", "adalazi", 'aasd', 111))
     print(interactor.create_account(id, "Jess", "Chavi", "jesschavi", 'aasd', 111))
-    print(interactor.get_account(user_name="adalazuli"))
-    print(interactor.get_account(account_id=2))
+    print(interactor.get_account_by_username(user_name="adalazuli"))
+    print(interactor.get_account_by_id(account_id=2))
     print('delete')
     print(interactor.delete_account("jesschavi"))
-    print(interactor.get_account("jesschavi"))
+    print(interactor.get_account_by_username("jesschavi"))
+    account = interactor.get_account_by_username(user_name="adalazi")
+    print(interactor.set_account_lock(account_id=account.account_id, locked=True))
+    account = interactor.get_account_by_username(user_name="adalazi")
+    print(account)
+    print(interactor.set_account_lock(account_id=account.account_id, locked=False))
+    account = interactor.get_account_by_username(user_name="adalazi")
+    print(account)
+    print(interactor.increment_log_in_attempt(account_id=account.account_id))
+    account = interactor.get_account_by_username(user_name="adalazi")
+    print(account)
+    print(interactor.reset_log_in_attempt(account_id=account.account_id))
+    account = interactor.get_account_by_username(user_name="adalazi")
+    print(account)
 
     # permissions
+    print(f"{'*' * 100}")
     print("PERMISSION CHANGES")
     roles = interactor.get_roles()[1]
-    id = roles[0]
+    id = roles.role_id
+    account = interactor.get_account_by_username(user_name="adalazi")
     print(interactor.get_permission_changes())
-    print(interactor.update_permissions(role_id=id, account_id=1))
+    print(interactor.update_permissions(role_id=id, account_id=account.account_id))
     print(interactor.get_permission_changes())
-    print(interactor.get_account(account_id=1))
+    print(interactor.get_account_by_id(account_id=account.account_id))
 
     # sessions
+    print(f"{'*' * 100}")
     print("SESSIONS")
-    roles = interactor.get_account(user_name="adalazi")
-    id = roles[0]
-    code = interactor.add_session(id)
+    account = interactor.get_account_by_username(user_name="adalazi")
+    code = interactor.add_session(account.account_id)
     print(f"Created code: {code}")
     print(interactor.get_session(code=code, account_id=id))
 
-
-
+    # items
+    print(f"{'*' * 100}")
+    print("ITEMS")
+    print(interactor.get_items())
+    print(interactor.add_item(account.account_id, "Item1", "This is a test item", 5))
+    print(interactor.add_item(account.account_id, "Item2", "This is a test item 2", 15))
+    print(interactor.add_item(account.account_id, "Item3", "This is a test item 3", 115))
+    print(interactor.get_items())
+    item_id = interactor.get_items()[0].item_id
+    print(interactor.get_item(item_id=item_id))
+    print(interactor.delete_item(item_id=item_id))
+    print(interactor.get_items())
+    item_id = interactor.get_items()[0].item_id
+    print(interactor.get_item(item_id=item_id))
+    print(interactor.update_item(item_id=item_id, name="updated item", description="updated description", quantity=12))
