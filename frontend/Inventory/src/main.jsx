@@ -10,6 +10,7 @@ import Root from "./routes/root";
 import ErrorPage from "./error-page";
 import CreateAccount from "./routes/createAccount";
 import Login from "./routes/login"
+import ShowAllItems from "./routes/allItems"
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
       {
         path: "createAccount",
         element: <CreateAccount />
+      },
+      {
+      path: "allItems",
+      element: <ShowAllItems />
       },
     ]
   },

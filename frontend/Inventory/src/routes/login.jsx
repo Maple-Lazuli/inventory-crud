@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import {redirect, useNavigate} from "react-router-dom";
 import Backend from '../api';
+import {setSession, setUsername, setJustAuthenticated} from "../credentials"
 
 export default function Login() {
     const [username, setUsername] = useState("");
@@ -21,13 +22,15 @@ export default function Login() {
                     password: password
     }).then( (res) => {
         console.log(res)
-        // if (res['data']['created']){
-        //     alert("Authenticated Successfully.")
-        //     navigate("/");
-        // } else {
-        //     alert("Could not log in")
-        // }
-    
+        if (res['data']['status'] == 0){
+            setSession(res['data']['code'])
+            setUsername(username)
+            setJustAuthenticated(true)
+            alert("Authenticated Successfully.")
+            navigate("/");
+        } else {
+            alert("Could not log in")
+        }
     })}
 
     return (

@@ -12,6 +12,15 @@ app = Flask(__name__)
 CORS(app)
 interactor = DBInteractions()
 
+from enum import Enum
+
+
+class Status(int, Enum):
+    SUCCESS = 0
+    USERNAME_TAKEN = 1
+    ACCOUNT_LOCKED = 2
+    AUTHENTICATION_FAILURE = 3
+
 
 class JSONEncoder(json.JSONEncoder):
     def default(self, object):
@@ -109,18 +118,18 @@ def login():
 
     if account.log_in_attempts >= 15:
         interactor.set_account_lock(account_id=account.account_id, locked=True)
-        return Response("This account is locked.", status=200, mimetype='text')
+        return Response(json.dumps({"code": "", "status": Status.ACCOUNT_LOCKED}), status=200, mimetype='text')
 
     if account.locked:
-        return Response("This account is locked.", status=200, mimetype='text')
+        return Response(json.dumps({"code": "", "status": Status.ACCOUNT_LOCKED}, cls=JSONEncoder), status=200, mimetype='text')
 
     if verify_hash(clear_text=password_not_hashed, salt=account.salt, stored_hash=account.password):
         code = interactor.add_session(account_id=account.account_id)
         interactor.reset_log_in_attempt(account_id=account.account_id)
-        return Response(code, status=200, mimetype='text')
+        return Response(json.dumps({"code": code, "status": Status.SUCCESS}), status=200, mimetype='text')
     else:
         interactor.increment_log_in_attempt(account_id=account.account_id)
-        return Response("Incorrect Password, Try Again.", status=200, mimetype='text')
+        return Response(json.dumps({"code": "", "status": Status.AUTHENTICATION_FAILURE}), status=200, mimetype='text')
 
 
 @app.route('/items', methods=['GET'])
