@@ -13,6 +13,8 @@ import Login from "./routes/login"
 import ShowAllItems from "./routes/allItems"
 import OwnedItems from "./routes/OwnedItems"
 import CreateItem from "./routes/CreateItem"
+import EditItem from "./routes/EditItem"
+
 
 const router = createBrowserRouter([
   {
@@ -37,9 +39,13 @@ const router = createBrowserRouter([
         element: <OwnedItems />
         },
         {
-        path: "CreateItem",
-        element: <CreateItem />
-        }
+          path: "CreateItem",
+          element: <CreateItem />
+          },
+          {
+          path: "EditItem",
+          element: <EditItem />
+          },
     ]
   },
 ]);

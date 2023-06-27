@@ -35,7 +35,8 @@ export default function OwnedItems() {
     
     return (
         <div class="container">
-            {/* Add new item here */}
+            <a class="btn btn-primary" href="/CreateItem" role="button">Add Item</a>
+            <hr />
         <div class="row flex-row">
         {items.map(item => ItemCardOwned(item, session, username))}
         </div>

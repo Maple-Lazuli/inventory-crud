@@ -34,20 +34,12 @@ export default function CreateItem() {
     const onItemSubmit = async (name, quantity, description) => {
         const response = await Backend.post(
             '/item', {
-                    role_id:role,
                     name: name,
                     description: description,
                     quantity: quantity,
     }).then( (res) => {
         
-        // if (res['data']['created']){
-        //     alert("Account Created Successfully.")
-        //     navigate("/");
-        // } else {
-        //     alert("Account Could Not Be Created.")
-        // }
-    
-      console.log(res)
+      navigate("/YourItems")
 
     })}
 

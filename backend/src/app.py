@@ -154,7 +154,7 @@ def create_item():
     name = request.json['name']
     description = request.json['description']
     quantity = request.json['quantity']
-
+    print(request.json)
     session_code = request.headers.get('Authorization').split(" ")[1]
     current_user = request.headers.get('Authorization').split(" ")[0]
 
@@ -176,8 +176,8 @@ def update_item():
     description = request.json['description']
     quantity = request.json['quantity']
 
-    session_code = request.json['session_code']
-    current_user = request.json['current_username']
+    session_code = request.headers.get('Authorization').split(" ")[1]
+    current_user = request.headers.get('Authorization').split(" ")[0]
 
     current_user_account = interactor.get_account_by_username(current_user)
     session = interactor.get_session(session_code, current_user_account.account_id)
