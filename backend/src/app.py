@@ -2,13 +2,14 @@ import json
 import dataclasses
 import datetime
 from flask import Flask, request, Response
-
+from flask_cors import CORS
 import random
 import hashlib
 
 from src.db_interactions import DBInteractions
 
 app = Flask(__name__)
+CORS(app)
 interactor = DBInteractions()
 
 
