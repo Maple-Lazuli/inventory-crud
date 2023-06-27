@@ -27,8 +27,7 @@ export default function Login() {
             setUsername(username)
             setAccountID(res['data']['account_id'])
             setJustAuthenticated(true)
-            alert("Authenticated Successfully.")
-            navigate("/allItems");
+            navigate("/YourItems");
         } else {
             alert("Could not log in")
         }

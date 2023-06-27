@@ -10,7 +10,6 @@ export default function Root() {
   const [active, setActive] = useState(null);
   const [username, setUsername] = useState("");
   
-  //set account and session stuff here
 
   getJustAuthenticated().then( (status) => {
     if (status){
@@ -30,14 +29,14 @@ export default function Root() {
   const logout = () => {
     setActive(false)
     setActiveSession(false)
-    //redirect to all items or login
+    navigate("/Allitems")
   }
 
   return (
         <>
           <nav className="navbar navbar-expand-lg bg-body-tertiary">
             <div className="container-fluid">
-              <a className="navbar-brand" href="#">Inventory</a>
+              <a className="navbar-brand" href="/">Inventory</a>
               <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span className="navbar-toggler-icon"></span>
               </button>
@@ -51,16 +50,18 @@ export default function Root() {
                   </li>
                 </ul>
                 { active?(<>
-                <b>{username}</b>
-                <button type="button" class="btn btn-outline-primary" onClick={() => {logout()}}>Sign Out</button>
+                <i>Logged in as: &nbsp;</i><b>{username}&nbsp;</b>
+                <button type="button" class="btn btn-outline-secondary" onClick={() => {logout()}}>Log Out</button>
                 </>):(<>
                 <button type="button" class="btn btn-outline-primary" onClick={() => {navigate("/login")}}>Log In</button>
-                <button type="button" class="btn btn-outline-primary" onClick={() => {navigate("/createAccount")}}>Create Account</button>
+                &nbsp;
+                <button type="button" class="btn btn-outline-secondary" onClick={() => {navigate("/createAccount")}}>Create Account</button>
                 </>
                 )}
               </div>
             </div>
           </nav>
+          <br/>
           <div className="container">
           <Outlet />
             </div>

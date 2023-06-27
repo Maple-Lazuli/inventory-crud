@@ -54,13 +54,29 @@ def valid_session(session):
     return True
 
 
+def sanitize_account(account):
+    account.salt = 0
+    account.locked = "Unknown"
+    account.log_in_attempts = 0
+    account.first_name = "Sanitized"
+    account.last_name = "Sanitized"
+    return account
+
+
 @app.route('/account', methods=['GET'])
 def get_account():
     args = request.args
     username = args['username']
     account = interactor.get_account_by_username(username)
-    # TODO sanitize password, salt, locked status, and log_in_attempts
+    account = sanitize_account(account)
     return Response(json.dumps(account, cls=JSONEncoder), status=200, mimetype='application/json')
+
+
+@app.route('/accounts', methods=['GET'])
+def get_accounts():
+    accounts = interactor.get_accounts()
+    accounts = [sanitize_account(a) for a in accounts]
+    return Response(json.dumps(accounts, cls=JSONEncoder), status=200, mimetype='application/json')
 
 
 @app.route('/account', methods=['POST'])
@@ -120,7 +136,8 @@ def login():
 
     if account.log_in_attempts >= 15:
         interactor.set_account_lock(account_id=account.account_id, locked=True)
-        return Response(json.dumps({"code": "", "status": Status.ACCOUNT_LOCKED}), status=200, mimetype='application/json')
+        return Response(json.dumps({"code": "", "status": Status.ACCOUNT_LOCKED}), status=200,
+                        mimetype='application/json')
 
     if account.locked:
         return Response(json.dumps({"code": "", "status": Status.ACCOUNT_LOCKED}, cls=JSONEncoder), status=200,
@@ -133,12 +150,26 @@ def login():
                         status=200, mimetype='text')
     else:
         interactor.increment_log_in_attempt(account_id=account.account_id)
-        return Response(json.dumps({"code": "", "status": Status.AUTHENTICATION_FAILURE}), status=200, mimetype='application/json')
+        return Response(json.dumps({"code": "", "status": Status.AUTHENTICATION_FAILURE}), status=200,
+                        mimetype='application/json')
 
 
 @app.route('/items', methods=['GET'])
 def get_items():
     items = interactor.get_items()
+    return Response(json.dumps(items, cls=JSONEncoder), status=200, mimetype='application/json')
+
+
+@app.route('/itemsMapped', methods=['GET'])
+def get_items_mapped():
+    items = interactor.get_items()
+    accounts = interactor.get_accounts()
+
+    for idx in range(len(items)):
+        item = items[idx]
+        item.account_id = [a.user_name for a in accounts if a.account_id == item.account_id][0]
+        items[idx] = item
+
     return Response(json.dumps(items, cls=JSONEncoder), status=200, mimetype='application/json')
 
 

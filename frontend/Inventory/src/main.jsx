@@ -14,7 +14,7 @@ import ShowAllItems from "./routes/allItems"
 import OwnedItems from "./routes/OwnedItems"
 import CreateItem from "./routes/CreateItem"
 import EditItem from "./routes/EditItem"
-
+import Index from "./routes/Index"
 
 const router = createBrowserRouter([
   {
@@ -22,6 +22,7 @@ const router = createBrowserRouter([
     element: <Root />,
     errorElement: <ErrorPage />,
     children: [
+      { index: true, element: <Index /> },
       {
         path: "login",
         element: <Login/>

@@ -15,12 +15,8 @@ export default function ItemCardOwned(item, session, username) {
         const response = await Backend.delete(
             `/item?item_id=${item_id}`).then( (res) => {
         console.log(res)
-        // if (res['data']['created']){
-        //     alert("Account Created Successfully.")
-        //     navigate("/");
-        // } else {
-        //     alert("Account Could Not Be Created.")
-        // }
+
+        navigate("/YourItems")
     
     })}
 
@@ -30,7 +26,7 @@ export default function ItemCardOwned(item, session, username) {
             <div className="card-body">
                 <h5 className="card-title">{item.name}</h5>
                 <h6 className="card-subtitle mb-2 text-body-secondary">Quantity: {item.quantity}</h6>
-                <p className="card-text">{item.description}</p> 
+                <p className="card-text">{item.description.length <= 100 ? (item.description): (item.description.slice(0,100) + "...")}</p> 
                 <a href={`/EditItem?item_id=${item.item_id}`} class="card-link">Edit</a>
                 <a href={"/YourItems"} class="card-link" onClick={() => deleteItem(item.item_id, username, session)}>Delete</a>
             </div>

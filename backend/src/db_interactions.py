@@ -151,7 +151,7 @@ class DBInteractions:
         fetched_accounts = []
         try:
             with self.connection, self.connection.cursor() as cur:
-                cur.execute(f"select * from accounts where;")
+                cur.execute(f"select * from accounts;")
                 fetched_accounts = cur.fetchall()
 
                 return [Account(*a) for a in fetched_accounts]
