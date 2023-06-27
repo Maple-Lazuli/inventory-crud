@@ -88,8 +88,9 @@ def update_account():
     username = request.json['username']
     password_not_hashed = request.json['password']
 
-    session_code = request.json['session_code']
-    current_user = request.json['current_username']
+    session_code = request.headers.get('Authorization').split(" ")[1]
+    current_user = request.headers.get('Authorization').split(" ")[0]
+
     current_user_account = interactor.get_account_by_username(current_user)
 
     session = interactor.get_session(session_code, current_user_account.account_id)
@@ -99,10 +100,10 @@ def update_account():
         interactor.update_account(account_id=current_user_account.account_id, first_name=first_name,
                                   last_name=last_name, user_name=username, password=new_password)
 
-        return Response("Updated successfully", status=200, mimetype='text')
+        return Response(json.dumps({"status": Status.SUCCESS}), status=200, mimetype='application/json')
 
     else:
-        return Response("Must be logged in to update an account", status=200, mimetype='text')
+        return Response(json.dumps({"status": Status.PERMISSION_DENIED}), status=200, mimetype='application/json')
 
 
 @app.route('/account', methods=['DELETE'])
@@ -119,7 +120,7 @@ def login():
 
     if account.log_in_attempts >= 15:
         interactor.set_account_lock(account_id=account.account_id, locked=True)
-        return Response(json.dumps({"code": "", "status": Status.ACCOUNT_LOCKED}), status=200, mimetype='text')
+        return Response(json.dumps({"code": "", "status": Status.ACCOUNT_LOCKED}), status=200, mimetype='application/json')
 
     if account.locked:
         return Response(json.dumps({"code": "", "status": Status.ACCOUNT_LOCKED}, cls=JSONEncoder), status=200,
@@ -132,7 +133,7 @@ def login():
                         status=200, mimetype='text')
     else:
         interactor.increment_log_in_attempt(account_id=account.account_id)
-        return Response(json.dumps({"code": "", "status": Status.AUTHENTICATION_FAILURE}), status=200, mimetype='text')
+        return Response(json.dumps({"code": "", "status": Status.AUTHENTICATION_FAILURE}), status=200, mimetype='application/json')
 
 
 @app.route('/items', methods=['GET'])
@@ -154,7 +155,6 @@ def create_item():
     name = request.json['name']
     description = request.json['description']
     quantity = request.json['quantity']
-    print(request.json)
     session_code = request.headers.get('Authorization').split(" ")[1]
     current_user = request.headers.get('Authorization').split(" ")[0]
 
@@ -164,9 +164,9 @@ def create_item():
     if valid_session(session):
         interactor.add_item(account_id=current_user_account.account_id, name=name,
                             description=description, quantity=quantity)
-        return Response("Created successfully", status=200, mimetype='text')
+        return Response(json.dumps({"status": Status.SUCCESS}), status=200, mimetype='application/json')
     else:
-        return Response("Must be logged in to create an item", status=200, mimetype='text')
+        return Response(json.dumps({"status": Status.PERMISSION_DENIED}), status=200, mimetype='application/json')
 
 
 @app.route('/item', methods=['PUT'])
@@ -184,13 +184,13 @@ def update_item():
 
     item = interactor.get_item(item_id=item_id)
     if item.account_id != current_user_account.account_id:
-        return Response("Cannot modify item of another user", status=200, mimetype='text')
+        return Response(json.dumps({"status": Status.PERMISSION_DENIED}), status=200, mimetype='application/json')
 
     if valid_session(session):
         interactor.update_item(item_id=item_id, name=name, description=description, quantity=quantity)
-        return Response("Updated successfully", status=200, mimetype='text')
+        return Response(json.dumps({"status": Status.SUCCESS}), status=200, mimetype='application/json')
     else:
-        return Response("Must be logged in to update an item", status=200, mimetype='text')
+        return Response(json.dumps({"status": Status.PERMISSION_DENIED}), status=200, mimetype='application/json')
 
 
 @app.route('/item', methods=['DELETE'])
@@ -205,13 +205,13 @@ def delete_item():
     item = interactor.get_item(item_id=item_id)
 
     if item.account_id != current_user_account.account_id:
-        return Response({"status": Status.PERMISSION_DENIED}, status=200, mimetype='text')
+        return Response(json.dumps({"status": Status.PERMISSION_DENIED}), status=200, mimetype='application/json')
 
     if valid_session(session):
         interactor.delete_item(item_id=item_id)
-        return Response({"status": Status.SUCCESS}, status=200, mimetype='text')
+        return Response(json.dumps({"status": Status.SUCCESS}), status=200, mimetype='application/json')
     else:
-        return Response({"status": Status.AUTHENTICATION_FAILURE}, status=200, mimetype='text')
+        return Response(json.dumps({"status": Status.AUTHENTICATION_FAILURE}), status=200, mimetype='application/json')
 
 
 def main():
