@@ -12,28 +12,36 @@ export default function CreateAccount() {
     const onFormSubmit = (event) => {
         event.preventDefault();
     
-        onAccountSubmit(firstname, lastname, username, password, 1)
+        onAccountSubmit(firstname, lastname, username, password, "manager")
         
       };
 
     const onAccountSubmit = async (firstname, lastname, username, password, role) => {
-        const response = await Backend.post(
-            '/account', {
-                    role_id:role,
-                    first_name: firstname,
-                    last_name: lastname,
-                    username: username,
-                    password: password
-    }).then( (res) => {
-        
-        if (res['data']['created']){
-            alert("Account Created Successfully.")
-            navigate("/");
+
+
+        if (username.indexOf(' ') >= 0){
+            alert("Spaces are not accepted in usernames.")
         } else {
-            alert("Account Could Not Be Created.")
-        }
+
     
-    })}
+                const response = await Backend.post(
+                    '/account', {
+                            role_name: role,
+                            first_name: firstname,
+                            last_name: lastname,
+                            username: username,
+                            password: password
+            }).then( (res) => {
+                
+                if (res['data']['created']){
+                    alert("Account Created Successfully.")
+                    navigate("/");
+                } else {
+                    alert("Account Could Not Be Created.")
+                }
+    
+    })}}
+
 
     return (
     <form onSubmit={onFormSubmit}>

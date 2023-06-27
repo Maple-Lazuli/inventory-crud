@@ -29,7 +29,7 @@ export default function Login() {
             setJustAuthenticated(true)
             navigate("/YourItems");
         } else {
-            alert("Could not log in")
+            alert("Authentication Failed")
         }
     })}
 
@@ -45,7 +45,7 @@ export default function Login() {
                 <input type="password" className="form-control" id="exampleInputPassword1"
                 onChange={() => setPassword(event.target.value)}/>
             </div>
-            <button type="submit" className="btn btn-primary">Create Account</button>
+            <button type="submit" className="btn btn-primary">Login</button>
     </form>
     );
   }
