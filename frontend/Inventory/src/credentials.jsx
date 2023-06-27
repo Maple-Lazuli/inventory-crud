@@ -31,3 +31,20 @@ export async function setUsername(username) {
 export async function setJustAuthenticated(status) {
     return localforage.setItem("just_authenticated", status)
   }
+
+
+  export async function getAccountID() {
+    return await localforage.getItem("account_id")
+}
+
+export async function setAccountID(id) {
+    return localforage.setItem("account_id", id)
+  }
+
+  export async function getActiveSession() {
+    return await localforage.getItem("session_status")
+}
+
+export async function setActiveSession(status) {
+    return localforage.setItem("session_status", status)
+  }

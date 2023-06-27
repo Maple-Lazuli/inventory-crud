@@ -1,7 +1,7 @@
 export default function ItemCard(item) {
 
     return(
-    <div class="col-3" key={item.id}>
+    <div class="col-3" key={item.name + item.item_id}>
         <div className="card">
         <div className="card-body">
             <h5 className="card-title">{item.name} ({item.quantity})</h5>

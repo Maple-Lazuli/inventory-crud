@@ -1,5 +1,5 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import {getUsername, getSession, getJustAuthenticated, setJustAuthenticated} from "../credentials"
+import {getUsername, getSession, getJustAuthenticated, setJustAuthenticated, setActiveSession, getActiveSession} from "../credentials"
 
 import React, { useRef, useEffect, useState } from 'react'
 
@@ -7,7 +7,7 @@ import localforage from "localforage";
 
 export default function Root() {
   const navigate = useNavigate()
-  const [active, setActive] = useState(false);
+  const [active, setActive] = useState(null);
   const [username, setUsername] = useState("");
   
   //set account and session stuff here
@@ -17,13 +17,20 @@ export default function Root() {
       setActive(status)
       console.log("We're live")
       setJustAuthenticated(false)
-
+      setActiveSession(true)
       getUsername().then( (u) => {setUsername(u)} )
     }
   })
 
+  if (active == null){
+    getActiveSession().then(status => setActive(status))
+    getUsername().then( (u) => {setUsername(u)} )
+  }
+
   const logout = () => {
     setActive(false)
+    setActiveSession(false)
+    //redirect to all items or login
   }
 
   return (
@@ -40,11 +47,11 @@ export default function Root() {
                     <a className="nav-link active" aria-current="page" href="/allItems">All Items</a>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link disabled">Your Items</a>
+                    <a className={active? ('nav-link') : ('nav-link disabled')} href="/YourItems">Your Items</a>
                   </li>
                 </ul>
                 { active?(<>
-                <b>Manager: </b> <i>username</i> 
+                <b>Manager: </b> <i>{username}</i> 
                 <button type="button" class="btn btn-outline-primary" onClick={() => {logout()}}>Sign Out</button>
                 </>):(<>
                 <button type="button" class="btn btn-outline-primary" onClick={() => {navigate("/login")}}>Log In</button>

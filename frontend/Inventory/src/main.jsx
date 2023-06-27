@@ -11,6 +11,8 @@ import ErrorPage from "./error-page";
 import CreateAccount from "./routes/createAccount";
 import Login from "./routes/login"
 import ShowAllItems from "./routes/allItems"
+import OwnedItems from "./routes/OwnedItems"
+import CreateItem from "./routes/CreateItem"
 
 const router = createBrowserRouter([
   {
@@ -27,9 +29,17 @@ const router = createBrowserRouter([
         element: <CreateAccount />
       },
       {
-      path: "allItems",
-      element: <ShowAllItems />
-      },
+        path: "allItems",
+        element: <ShowAllItems />
+        },
+        {
+        path: "yourItems",
+        element: <OwnedItems />
+        },
+        {
+        path: "CreateItem",
+        element: <CreateItem />
+        }
     ]
   },
 ]);

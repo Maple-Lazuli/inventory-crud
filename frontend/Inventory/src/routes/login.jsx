@@ -1,10 +1,10 @@
 import React, {useState} from "react";
 import {redirect, useNavigate} from "react-router-dom";
 import Backend from '../api';
-import {setSession, setUsername, setJustAuthenticated} from "../credentials"
+import {setSession, setUsername, setJustAuthenticated, setAccountID} from "../credentials"
 
 export default function Login() {
-    const [username, setUsername] = useState("");
+    const [username, setUsernameLocal] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate()
 
@@ -25,9 +25,10 @@ export default function Login() {
         if (res['data']['status'] == 0){
             setSession(res['data']['code'])
             setUsername(username)
+            setAccountID(res['data']['account_id'])
             setJustAuthenticated(true)
             alert("Authenticated Successfully.")
-            navigate("/");
+            navigate("/allItems");
         } else {
             alert("Could not log in")
         }
@@ -38,7 +39,7 @@ export default function Login() {
         <div className="mb-3">
         <label htmlFor="username" className="form-label">User Name</label>
         <input type="text" className="form-control" id="username" placeholder=""
-        onChange={() => setUsername(event.target.value)}/>
+        onChange={() => setUsernameLocal(event.target.value)}/>
         </div>
             <div className="mb-3">
                 <label htmlFor="exampleInputPassword1" className="form-label">Password</label>
