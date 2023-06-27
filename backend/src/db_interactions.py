@@ -35,21 +35,14 @@ class DBInteractions:
                 cur.execute("insert into roles (role_name) values (%(r)s);", {'r': role_name})
 
             return True
-            # TODO
-            # Log f"Added {role_name} Successfully"
 
         except errors.lookup(UNIQUE_VIOLATION) as e:
             print(e)
             return False
-            # TODO
-            # "Unique Violation"
 
         except Exception as e:
             print(e)
-
             return False
-            # TODO
-            # log exception
 
     def get_roles(self):
         fetched_roles = []
@@ -63,8 +56,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return fetched_roles
-            # TODO
-            # log exception
 
     def get_role(self, role_id):
 
@@ -77,7 +68,18 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return None
-        # TODO
+
+    def get_role_by_name(self, role_name):
+        result = None
+        try:
+            with self.connection, self.connection.cursor() as cur:
+                cur.execute(f"select * from roles where role_name = %(name)s;", {'name': role_name})
+                result = cur.fetchone()
+
+            return Role(*result) if result is not None else None
+        except Exception as e:
+            print(e)
+            return result
 
     def create_account(self, role_id, first_name, last_name, user_name, password, salt):
 
@@ -95,13 +97,10 @@ class DBInteractions:
                                                                                      'log_ins': 0})
 
             return True
-            # TODO
-            # Log f"Added {role_name} Successfully"
 
         except Exception as e:
             print(e)
             return False
-        # TODO
 
     def update_account(self, account_id, first_name, last_name, user_name, password):
 
@@ -113,13 +112,11 @@ class DBInteractions:
                              'username': user_name, 'password': password})
 
             return True
-            # TODO
-            # Log f"Updated {role_name} Successfully"
+
 
         except Exception as e:
             print(e)
             return False
-        # TODO
 
     def get_account_by_id(self, account_id):
         result = None
@@ -132,7 +129,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return result
-        # TODO
 
     def get_account_by_username(self, user_name):
         result = None
@@ -145,7 +141,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return result
-        # TODO
 
     def get_accounts(self):
         fetched_accounts = []
@@ -159,7 +154,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return fetched_accounts
-        # TODO
 
     def delete_account(self, user_name):
 
@@ -172,7 +166,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return False
-        # TODO
 
     def set_account_lock(self, account_id, locked):
         try:
@@ -182,7 +175,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return False
-            # log failure
 
     def increment_log_in_attempt(self, account_id):
         account = self.get_account_by_id(account_id)
@@ -197,7 +189,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return False
-            # log failure
 
     def reset_log_in_attempt(self, account_id):
         try:
@@ -210,7 +201,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return False
-            # log failure
 
     def update_permissions(self, role_id, account_id):
 
@@ -221,8 +211,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return False
-            # log failure
-        # TODO
 
         try:
             with self.connection, self.connection.cursor() as cur:
@@ -233,8 +221,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return False
-            # log failure
-        # TODO
 
         return True
 
@@ -249,8 +235,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return results
-            # TODO
-            # log exception
 
     def get_session(self, code, account_id):
         fetched_session = None
@@ -265,7 +249,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return fetched_session
-        # TODO
 
     def add_session(self, account_id):
         # create code
@@ -282,8 +265,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return None
-            # log failure
-        # TODO
 
     def add_item(self, account_id, name, description, quantity):
         try:
@@ -298,8 +279,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return None
-            # log failure
-        # TODO
 
     def get_item(self, item_id):
 
@@ -317,7 +296,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return fetched_item
-        # TODO
 
     def get_items(self):
         fetched_items = []
@@ -332,7 +310,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return fetched_items
-        # TODO
 
     def delete_item(self, item_id):
         try:
@@ -345,7 +322,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return False
-        # TODO
 
     def update_item(self, item_id, name, description, quantity):
         try:
@@ -358,8 +334,6 @@ class DBInteractions:
         except Exception as e:
             print(e)
             return False
-            # log failure
-        # TODO
 
 
 @dataclass

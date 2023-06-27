@@ -81,17 +81,25 @@ def get_accounts():
 
 @app.route('/account', methods=['POST'])
 def create_account():
-    role_id = request.json['role_id']
+    role_name = request.json['role_name']
     first_name = request.json['first_name']
     last_name = request.json['last_name']
-    username = request.json['username']
+    username = request.json['username'].strip().replace(" ", "")
 
     password_not_hashed = request.json['password']
     salt = random.randint(1, 100000)
 
     password = create_hash(password_not_hashed, salt)
 
-    status = interactor.create_account(role_id=role_id, first_name=first_name, last_name=last_name,
+    role = interactor.get_role_by_name(role_name)
+
+    if role is None:
+        interactor.create_new_role(role_name=role_name)
+        print("Created Role")
+
+    role = interactor.get_role_by_name(role_name)
+
+    status = interactor.create_account(role_id=role.role_id, first_name=first_name, last_name=last_name,
                                        user_name=username, password=password, salt=salt)
 
     return Response(json.dumps({'created': status}), status=200, mimetype='application/json')
