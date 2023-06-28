@@ -5,11 +5,9 @@ services:
     restart: always
     container_name: postgres
     environment:
-      - bind-address=0.0.0.0
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    ports:
-      -  '5432:5432'
+      
     volumes: 
       - db:/var/lib/postgresql/data
       - ./db/initial.sql:/docker-entrypoint-initdb.d/create_tables.sql
@@ -22,7 +20,6 @@ services:
        - '5001:5001'
      volumes:
        - .:/src    
-      
       
 volumes:
   db:
