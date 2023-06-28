@@ -35,7 +35,7 @@ export default function CreateAccount() {
                 
                 if (res['data']['created']){
                     alert("Account Created Successfully.")
-                    navigate("/");
+                    navigate("/login");
                 } else {
                     alert("Account Could Not Be Created.")
                 }
@@ -45,6 +45,7 @@ export default function CreateAccount() {
 
     return (
     <form onSubmit={onFormSubmit}>
+        <h2>Create an account:</h2>
         <div className="mb-3">
         <label htmlFor="firstname" className="form-label">First Name</label>
         <input type="text" className="form-control" id="firstname" placeholder=""

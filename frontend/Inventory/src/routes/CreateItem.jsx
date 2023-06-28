@@ -46,6 +46,7 @@ export default function CreateItem() {
 
     return (
     <form onSubmit={onFormSubmit}>
+      <h2>Add an item:</h2>
         <div className="mb-3">
         <label htmlFor="name" className="form-label">Name</label>
         <input type="text" className="form-control" id="name" placeholder=""

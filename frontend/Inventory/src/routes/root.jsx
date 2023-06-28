@@ -14,7 +14,6 @@ export default function Root() {
   getJustAuthenticated().then( (status) => {
     if (status){
       setActive(status)
-      console.log("We're live")
       setJustAuthenticated(false)
       setActiveSession(true)
       getUsername().then( (u) => {setUsername(u)} )

@@ -142,6 +142,10 @@ def login():
 
     account = interactor.get_account_by_username(username)
 
+    if account is None:
+        return Response(json.dumps({"code": "", "status": Status.AUTHENTICATION_FAILURE}), status=200,
+                        mimetype='application/json')
+
     if account.log_in_attempts >= 15:
         interactor.set_account_lock(account_id=account.account_id, locked=True)
         return Response(json.dumps({"code": "", "status": Status.ACCOUNT_LOCKED}), status=200,

@@ -7,13 +7,16 @@ import ItemCard from "../itemCard"
 export default function ShowAllItems() {
     const [items, setItems] = useState([]);
     const [accounts, setAccounts] = useState([]);
+    const [tried, setTried] = useState(false);
+    
 
     const getItems = async () => {
         const response = await Backend.get(
             '/itemsMapped', {}).then( (res) => {setItems(res['data'])})}
 
-    if (items.length == 0){
+    if (items.length == 0 && !tried){
         getItems()
+        setTried(true)
     }
 
     return (

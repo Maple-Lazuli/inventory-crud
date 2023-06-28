@@ -35,6 +35,7 @@ export default function Login() {
 
     return (
     <form onSubmit={onFormSubmit}>
+        <h2>Login:</h2>
         <div className="mb-3">
         <label htmlFor="username" className="form-label">User Name</label>
         <input type="text" className="form-control" id="username" placeholder=""
