@@ -4,13 +4,13 @@
 
 ### DB and Backend
 
-To start the database and backend, use the following command front the root directory of the project
+To start the database and backend, use the following command front the __root__ directory of the project
 
 ```
 docker-compose -f docker-compose.yml up --build
 ```
 
-This will start postgress in a docker container and the api in a second container that is reachable on the exposed port 5001.
+This will start postgres in a docker container and the backend api in a second container.
 
 ### FrontEnd
 
