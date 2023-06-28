@@ -6,7 +6,7 @@ from flask_cors import CORS
 import random
 import hashlib
 
-from src.db_interactions import DBInteractions
+from db_interactions import DBInteractions
 
 app = Flask(__name__)
 CORS(app)
@@ -257,8 +257,14 @@ def delete_item():
         return Response(json.dumps({"status": Status.AUTHENTICATION_FAILURE}), status=200, mimetype='application/json')
 
 
+@app.route('/')
+def home():
+    return Response("Operational", status=200, mimetype='application/json')
+
+
 def main():
     app.run(host='0.0.0.0', port=5001, debug=True)
+    print("running")
 
 
 if __name__ == "__main__":

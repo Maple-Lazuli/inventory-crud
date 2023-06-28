@@ -3,6 +3,7 @@ import psycopg2 as pg
 from psycopg2.errorcodes import UNIQUE_VIOLATION
 from psycopg2 import errors
 import random
+import time
 
 from datetime import datetime, timedelta
 import hashlib
@@ -19,15 +20,17 @@ class DBInteractions:
     db_name: str = 'inventory_db'
     db_user: str = 'postgres'
     db_pass: str = 'postgres'
-    db_host: str = '127.0.0.1'
+    db_host: str = 'postgres'
     db_port: str = '5432'
 
     def __post_init__(self):
+        time.sleep(10)
         self.connection = pg.connect(database=self.db_name,
                                      user=self.db_user,
                                      password=self.db_pass,
                                      host=self.db_host,
                                      port=self.db_port)
+
 
     def create_new_role(self, role_name):
         try:
